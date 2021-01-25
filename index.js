@@ -17,7 +17,7 @@ app.use('/posts', postRoutes);
 app.use('/users', userRoutes);
 
 app.get('/', (req,res) =>{
-    res.send('Hello to movieZilla API');
+    res.send('Hello to movieZilla API update');
 });
 
 const PORT = process.env.PORT || 5000;
