@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import PostMessage from "../models/postMassage.js";
+import liked from '../models/likedModel.js';
  
  export const getPosts =async (req,res) => {
      try{
@@ -43,13 +44,48 @@ export const deletePost = async(req,res) => {
 
 }
 
-export const likePost = async(req,res) => {
-
+export const ifAlreadyLiked = async(req ,res ) => {
     const {id} = req.params;
-    if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send('No post with that id');
-    const post = await PostMessage.findById(id);
-    const updatedPost = await PostMessage.findByIdAndUpdate(id, {likeCount: post.likeCount+1}, {new:true} );
+    const {email} = req.params;
 
-    res.json(updatedPost);
+    const newLike = new liked();
+    newLike.postId = id;
+    newLike.email = email;
+    try {
+        const r= await newLike.findOne(newLike);
+        console.log(r);
+        res.json({
+            'isExits': false
+        })
+    } catch (error) {
+        res.json({
+            'isExits': true
+        })
+    }
+
 }
 
+export const likePost = async(req,res) => {
+    const {id} = req.params;
+    const {email} = req.params;
+
+    try {
+        if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send('No post with that id');
+        const post = await PostMessage.findById(id);
+        const updatedPost = await PostMessage.findByIdAndUpdate(id, {likeCount: post.likeCount+1}, {new:true} );
+        res.json({
+            updatedPost,
+        });
+    } catch (error) {
+        res.json(error);
+    }
+}
+
+export const unlikePost = async(req,res) => {
+    const {id} = req.params;
+    await liked.findByIdAndRemove(id);
+    if(!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send('No post with that id');
+    const post = await PostMessage.findById(id);
+    const updatedPost = await PostMessage.findByIdAndUpdate(id, {likeCount: post.likeCount-1}, {new:true} );
+    res.json(updatedPost);
+}
