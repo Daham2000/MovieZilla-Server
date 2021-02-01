@@ -126,3 +126,13 @@ export const findTvSeries = async (req, res) => {
 
 };
 
+export const findHollyhoodNews = async (req, res) => {
+
+  try {
+    const posts = await PostMessage.find( { tags: "Hollyhood" } );
+    res.status(200).json(posts);
+  } catch (error) {
+    res.json(error);
+  }
+
+};
